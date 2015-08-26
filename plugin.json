@@ -1,0 +1,32 @@
+{
+    "label": {
+        "de": "Google Zertifizierte Händler für Shopware",
+        "en": "Google Certified Shops for Shopware"
+    },
+    "copyright": "(c) arvatis media GmbH",
+    "license": "proprietary",
+    "link": "http://store.shopware.com",
+    "author": "arvatis media GmbH",
+
+    "currentVersion": "1.0.0",
+
+    "changelog": {
+        "de": {
+	    "1.0.2": "Shopware 4 Kompatibilität",
+	    "1.0.1": "Fehlerkorrekturen",
+            "1.0.0": "Erstveröffentlichung"
+        },
+        "en": {
+	    "1.0.2": "Shopware 4 combatibility",
+	    "1.0.1": "Bugfixes",
+            "1.0.0": "First release"
+        }
+    },
+
+    "compatibility": {
+        "minimumVersion": "4.3.6",
+        "maximumVersion": null,
+        "blacklist": [
+        ]
+    }
+}

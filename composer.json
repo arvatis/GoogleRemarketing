@@ -1,0 +1,16 @@
+{
+    "name": "arvatis/googleremarketing",
+    "authors": [
+        {
+            "name": "Jochen Manz",
+            "email": "manz@arvatis.com"
+        }
+    ],
+    "type": "shopware-frontend-plugin",
+    "require": {
+        "composer/installers": "~1.0"
+    },
+    "extra": {
+        "installer-name": "ArvGoogleRemarketing"
+    }
+}

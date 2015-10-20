@@ -14,7 +14,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
      */
     public function getVersion()
     {
-        return '1.0.0';
+        return '1.0.1';
     }
 
     /**
@@ -59,14 +59,29 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
     }
 
     /**
+     * Update plugin method
+     *
+     * @param string $version
+     *
+     * @return bool
+     */
+    public function update($version)
+    {
+        // Remove update zip if it exists
+        $updateFile = dirname(__FILE__) . "/ArvGoogleRemarketing.zip";
+        if (file_exists($updateFile)) {
+            unlink($updateFile);
+        }
+
+        return true;
+    }
+
+    /**
      * Register Events
      */
     private function subscribeEvents()
     {
-        $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch_Frontend',
-            'onPostDispatch'
-        );
+        $this->subscribeEvent('Enlight_Controller_Action_PostDispatch_Frontend', 'onPostDispatch');
     }
 
     /**

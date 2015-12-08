@@ -131,7 +131,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $view->addTemplateDir(__DIR__ . '/Views/Responsive');
         } else {
             $view->addTemplateDir(__DIR__ . '/Views/Emotion');
-            $view->extendsTemplate('frontend/checkout/index_google.tpl');
+            $view->extendsTemplate('frontend/index/index_google.tpl');
         }
 
         $view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField($request, $view));

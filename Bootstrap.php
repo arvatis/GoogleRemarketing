@@ -14,7 +14,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
      */
     public function getVersion()
     {
-        return '1.0.2';
+        return '1.0.3';
     }
 
     /**
@@ -71,6 +71,10 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         $updateFile = dirname(__FILE__) . "/ArvGoogleRemarketing.zip";
         if (file_exists($updateFile)) {
             unlink($updateFile);
+        }
+
+        if (version_compare($version, '1.0.3', '<')) {
+            $this->createForm();
         }
 
         return true;

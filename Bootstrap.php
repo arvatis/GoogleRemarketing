@@ -14,7 +14,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
      */
     public function getVersion()
     {
-        return '1.0.1';
+        return '1.0.2';
     }
 
     /**
@@ -39,7 +39,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             'source' => "Community",
             'description' => '',
             'license' => 'commercial',
-            'copyright' => 'Copyright © 2014, arvatis media GmbH',
+            'copyright' => 'Copyright © 2015, arvatis media GmbH',
             'support' => '',
             'link' => 'http://www.arvatis.com/'
         );
@@ -102,6 +102,16 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             'value' => null,
             'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
         ));
+
+        $form->setElement('select', 'ARTICLE_FIELD', array(
+            'label' => 'Welche Nummern sollen übertragen werden?',
+            'store' => array(
+                array('articleID', 'Interne Artikel-ID'),
+                array('ordernumber', 'Artikelnummer'),
+                array('ean', 'EAN')
+            ),
+            'required' => true,
+        ));
     }
 
     /**
@@ -123,6 +133,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         if (empty($config->CONVERSION_ID)) {
             return;
         }
+        $articleField = $config->ARTICLE_FIELD;
 
         $view->addTemplateDir(__DIR__ . '/Views/Common');
 
@@ -134,7 +145,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $view->extendsTemplate('frontend/index/index_google.tpl');
         }
 
-        $view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField($request, $view));
+        $view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField($request, $view, $articleField));
         $view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField($request, $view));
         $view->assign('ARV_GR_ECOM_TOTALVALUE', $this->getTotalValueField($request, $view));
 
@@ -164,19 +175,24 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
      *
      * @return string
      */
-    private function getProdIdField(Enlight_Controller_Request_Request $request, Enlight_View_Default $view)
+    private function getProdIdField(Enlight_Controller_Request_Request $request, Enlight_View_Default $view, $articleField)
     {
         $sArticle = $view->getAssign('sArticle');
         $sArticles = $view->getAssign('sArticles');
         $sBasket = $view->getAssign('sBasket');
+        if (empty($articleField)) {
+            $articleField = 'articleID';
+        }
 
-        if (!empty($sArticle) && !empty($sArticle['articleID'])) {
-            return "'" . $sArticle['articleID'] . "'";
+        if (!empty($sArticle) && !empty($sArticle[$articleField])) {
+            return "'" . $sArticle[$articleField] . "'";
         } elseif (!empty($sArticles)) {
             $products = array();
 
             foreach ($sArticles as $article) {
-                $products[] = $article['articleID'];
+                if(!empty($article[$articleField])) {
+                    $products[] = $article[$articleField];
+                }
             }
 
             return $this->getProductString($products);
@@ -184,8 +200,9 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $products = array();
 
             foreach ($sBasket['content'] as $article) {
-                if ($article['modus'] == 0 && $article['articleID'] > 0)
-                    $products[] = $article['articleID'];
+                if ($article['modus'] == 0 && !empty($article[$articleField])){
+                    $products[] = $article[$articleField];
+                }
             }
 
             return $this->getProductString($products);
@@ -233,19 +250,28 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
     private function getTotalValueField($request, $view)
     {
         $controller = $request->getControllerName();
+        $action = $request->getActionName();
+        $totalVal = 0;
 
-        if ($controller == 'checkout') {
+        if ($controller == 'checkout' && ($action == 'confirm' || $action == 'cart' || $action == 'finish')) {
             $sAmount = $view->getAssign('sAmount');
             $sAmountWithTax = $view->getAssign('sAmountWithTax');
             $sUserData = $view->getAssign('sUserData');
 
             if ($sAmountWithTax && $sUserData['additional']['charge_vat']) {
-                return $sAmountWithTax;
+                $totalVal = $sAmountWithTax;
             } else {
-                return $sAmount;
+                $totalVal = $sAmount;
             }
+        } elseif ($controller == 'detail') {
+            $sArticle = $view->getAssign('sArticle');
+            $totalVal = $sArticle['price_numeric'];
         }
 
-        return '';
+        if (empty($totalVal)) {
+            $totalVal = 0;
+        }
+
+        return $totalVal;
     }
 }

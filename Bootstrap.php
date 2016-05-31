@@ -73,7 +73,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             unlink($updateFile);
         }
 
-        if (version_compare($version, '1.0.3', '<')) {
+        if (version_compare($version, '1.0.4', '<')) {
             $this->createForm();
         }
 

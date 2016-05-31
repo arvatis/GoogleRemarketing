@@ -110,12 +110,31 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         $form->setElement('select', 'ARTICLE_FIELD', array(
             'label' => 'Welche Nummern sollen übertragen werden?',
             'store' => array(
-                array('articleID', 'Interne Artikel-ID'),
-                array('ordernumber', 'Artikelnummer'),
-                array('ean', 'EAN')
+                array('articleID', 'Interne Artikel-ID (DB: articleID)'),
+                array('ordernumber', 'Artikelnummer (DB: ordernumber)'),
+                array('ean', 'EAN (DB: ean)')
             ),
             'required' => true,
         ));
+
+        $this->translateForm();
+    }
+
+
+    /**
+     *
+     */
+    private function translateForm()
+    {
+        $translations = array(
+            'en_GB' => array(
+                'ARTICLE_FIELD' => array(
+                    'label' => 'Which IDs should be used?'
+                )
+            )
+        );
+
+        $this->addFormTranslations($translations);
     }
 
     /**

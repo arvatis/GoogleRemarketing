@@ -1,8 +1,8 @@
 # Google Remarketing für Shopware
 
 - **License**: MIT
-- **Github Repository**: https://github.com/arvatis/ArvGoogleRemarketing
-- **Issue Tracker**: https://github.com/arvatis/ArvGoogleRemarketing/issues
+- **Github Repository**: https://github.com/arvatis/GoogleRemarketing
+- **Issue Tracker**: https://github.com/arvatis/GoogleRemarketing/issues
 
 # Installation
 

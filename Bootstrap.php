@@ -295,6 +295,6 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $totalVal = 0;
         }
 
-        return $totalVal;
+        return round( $totalVal, 2 );
     }
 }

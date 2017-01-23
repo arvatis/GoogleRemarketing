@@ -1,31 +1,10 @@
 <?php
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Shopware\Components\Theme\LessDefinition;
-use Shopware\Models\Category\Repository;
-
 /**
  * Class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap
  */
 class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
-    /**
-     * @return string
-     */
-    public function getVersion()
-    {
-        return '1.0.4';
-    }
-
-    /**
-     * Get (nice) name for plugin manager list
-     * @return string
-     */
-    public function getLabel()
-    {
-        return 'Google Remarketing';
-    }
-
     /**
      * Get version tag of this plugin to display in manager
      * @return string
@@ -46,6 +25,23 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
     }
 
     /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return '1.0.4';
+    }
+
+    /**
+     * Get (nice) name for plugin manager list
+     * @return string
+     */
+    public function getLabel()
+    {
+        return 'Google Remarketing';
+    }
+
+    /**
      * Install plugin method
      *
      * @return bool
@@ -54,28 +50,6 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
     {
         $this->subscribeEvents();
         $this->createForm();
-
-        return true;
-    }
-
-    /**
-     * Update plugin method
-     *
-     * @param string $version
-     *
-     * @return bool
-     */
-    public function update($version)
-    {
-        // Remove update zip if it exists
-        $updateFile = dirname(__FILE__) . "/ArvGoogleRemarketing.zip";
-        if (file_exists($updateFile)) {
-            unlink($updateFile);
-        }
-
-        if (version_compare($version, '1.0.4', '<')) {
-            $this->createForm();
-        }
 
         return true;
     }
@@ -120,7 +94,6 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         $this->translateForm();
     }
 
-
     /**
      *
      */
@@ -135,6 +108,28 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         );
 
         $this->addFormTranslations($translations);
+    }
+
+    /**
+     * Update plugin method
+     *
+     * @param string $version
+     *
+     * @return bool
+     */
+    public function update($version)
+    {
+        // Remove update zip if it exists
+        $updateFile = __DIR__ . '/ArvGoogleRemarketing.zip';
+        if (file_exists($updateFile)) {
+            unlink($updateFile);
+        }
+
+        if (version_compare($version, '1.0.4', '<')) {
+            $this->createForm();
+        }
+
+        return true;
     }
 
     /**
@@ -168,37 +163,20 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $view->extendsTemplate('frontend/index/index_google.tpl');
         }
 
-        $view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField($request, $view, $articleField));
-        $view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField($request, $view));
+        $view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField($view, $articleField));
+        $view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField($request));
         $view->assign('ARV_GR_ECOM_TOTALVALUE', $this->getTotalValueField($request, $view));
 
         $view->assign('ARV_GR_CONVERSION_ID', $config->CONVERSION_ID);
     }
 
     /**
-     * @return bool
-     */
-    public function uninstall()
-    {
-        return true;
-    }
-
-    protected function getProductString($products)
-    {
-        if (!empty($products)) {
-            return "['" . implode("','", $products) . "']";
-        }
-
-        return "''";
-    }
-
-    /**
-     * @param Enlight_Controller_Request_Request $request
      * @param Enlight_View_Default $view
+     * @param string $articleField
      *
      * @return string
      */
-    private function getProdIdField(Enlight_Controller_Request_Request $request, Enlight_View_Default $view, $articleField)
+    private function getProdIdField(Enlight_View_Default $view, $articleField)
     {
         $sArticle = $view->getAssign('sArticle');
         $sArticles = $view->getAssign('sArticles');
@@ -213,7 +191,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $products = array();
 
             foreach ($sArticles as $article) {
-                if(!empty($article[$articleField])) {
+                if (!empty($article[$articleField])) {
                     $products[] = $article[$articleField];
                 }
             }
@@ -223,7 +201,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $products = array();
 
             foreach ($sBasket['content'] as $article) {
-                if ($article['modus'] == 0 && !empty($article[$articleField])){
+                if ($article['modus'] == 0 && !empty($article[$articleField])) {
                     $products[] = $article[$articleField];
                 }
             }
@@ -234,31 +212,37 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         return "''";
     }
 
+    protected function getProductString($products)
+    {
+        if (!empty($products)) {
+            return "['" . implode("','", $products) . "']";
+        }
+
+        return "''";
+    }
+
     /**
      * @param Enlight_Controller_Request_Request $request
-     * @param Enlight_View_Default $view
      *
      * @return string
      */
-    private function getPageTypeField($request, $view)
+    private function getPageTypeField($request)
     {
         $controller = $request->getControllerName();
         $action = $request->getActionName();
 
-        if ($controller == 'index' && $action == 'index') {
+        if ($controller === 'index' && $action === 'index') {
             return 'home';
-        } elseif ($controller == 'search') {
+        } elseif ($controller === 'search') {
             return 'searchresults';
-        } elseif ($controller == 'listing') {
+        } elseif ($controller === 'listing') {
             return 'category';
-        } elseif ($controller == 'detail') {
+        } elseif ($controller === 'detail') {
             return 'product';
-        } elseif ($controller == 'checkout' && ($action == 'confirm' || $action == 'cart')) {
+        } elseif ($controller === 'checkout' && ($action === 'confirm' || $action === 'cart')) {
             return 'cart';
-        } elseif ($controller == 'checkout' && $action == 'finish') {
+        } elseif ($controller === 'checkout' && $action === 'finish') {
             return 'purchase';
-        } elseif ($controller == 'search') {
-            return 'searchresults';
         }
 
         return 'other';
@@ -276,7 +260,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
         $action = $request->getActionName();
         $totalVal = 0;
 
-        if ($controller == 'checkout' && ($action == 'confirm' || $action == 'cart' || $action == 'finish')) {
+        if ($controller === 'checkout' && ($action === 'confirm' || $action === 'cart' || $action === 'finish')) {
             $sAmount = $view->getAssign('sAmount');
             $sAmountWithTax = $view->getAssign('sAmountWithTax');
             $sUserData = $view->getAssign('sUserData');
@@ -286,7 +270,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             } else {
                 $totalVal = $sAmount;
             }
-        } elseif ($controller == 'detail') {
+        } elseif ($controller === 'detail') {
             $sArticle = $view->getAssign('sArticle');
             $totalVal = $sArticle['price_numeric'];
         }
@@ -295,6 +279,14 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
             $totalVal = 0;
         }
 
-        return round( $totalVal, 2 );
+        return round($totalVal, 2);
+    }
+
+    /**
+     * @return bool
+     */
+    public function uninstall()
+    {
+        return true;
     }
 }

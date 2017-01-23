@@ -29,7 +29,7 @@ class Shopware_Plugins_Frontend_ArvGoogleRemarketing_Bootstrap extends Shopware_
      */
     public function getVersion()
     {
-        return '1.0.4';
+        return '1.0.5';
     }
 
     /**

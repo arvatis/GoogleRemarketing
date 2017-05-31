@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../../engine/Shopware/Components/Plugin/schema/config.xsd">
+    <elements>
+        <element type="text" scope="shop">
+            <name>CONVERSION_ID</name>
+            <label lang="de">Conversion ID / Tracking ID</label>
+            <label lang="en">Conversion ID / Tracking ID</label>
+            <value>null</value>
+        </element>
+        <element type="select" scope="shop" required="true">
+            <name>ARTICLE_FIELD</name>
+            <label lang="de">Welche Nummern sollen übertragen werden?</label>
+            <label lang="en">Which IDs should be used?</label>
+            <value>null</value>
+            <store>
+                <option>
+                    <value>articleID</value>
+                    <label lang="de">Interne Artikel-ID (DB: articleID)</label>
+                    <label lang="en">Internal Article-ID (DB: articleID)</label>
+                </option>
+                <option>
+                    <value>ordernumber</value>
+                    <label lang="de">Artikelnummer (DB: ordernumber)</label>
+                    <label lang="en">Articlenumber (DB: ordernumber)</label>
+                </option>
+                <option>
+                    <value>ean</value>
+                    <label lang="de">EAN (DB: ean)</label>
+                    <label lang="en">EAN (DB: ean)</label>
+                </option>
+            </store>
+        </element>
+    </elements>
+</config>

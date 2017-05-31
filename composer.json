@@ -6,7 +6,7 @@
             "email": "manz@arvatis.com"
         }
     ],
-    "type": "shopware-frontend-plugin",
+    "type": "shopware-plugin",
     "require": {
         "composer/installers": "~1.0"
     },

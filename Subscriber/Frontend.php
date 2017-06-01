@@ -3,10 +3,10 @@
 namespace ArvGoogleRemarketing\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
-use \Enlight_Controller_ActionEventArgs;
-use \Exception;
-use \Enlight_Controller_Request_Request;
-use \Enlight_View_Default;
+use Enlight_Controller_ActionEventArgs;
+use Enlight_Controller_Request_Request;
+use Enlight_View_Default;
+use Exception;
 
 class Frontend implements SubscriberInterface
 {
@@ -28,9 +28,9 @@ class Frontend implements SubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            'Enlight_Controller_Action_PostDispatch_Frontend' => 'onPostDispatch'
-        );
+        return [
+            'Enlight_Controller_Action_PostDispatch_Frontend' => 'onPostDispatch',
+        ];
     }
 
     /**
@@ -49,6 +49,15 @@ class Frontend implements SubscriberInterface
         $this->setView();
     }
 
+    protected function getProductString($products)
+    {
+        if (!empty($products)) {
+            return "['" . implode("','", $products) . "']";
+        }
+
+        return "''";
+    }
+
     /**
      * @return string
      */
@@ -63,32 +72,31 @@ class Frontend implements SubscriberInterface
 
         if (!empty($sArticle) && !empty($sArticle[$this->config['articleField']])) {
             return "'" . $sArticle[$this->config['articleField']] . "'";
-        } elseif (!empty($sArticles)) {
-            $products = array();
+        }
+
+        if (!empty($sArticles)) {
+            $products = [];
             foreach ($sArticles as $article) {
                 if (!empty($article[$this->config['articleField']])) {
                     $products[] = $article[$this->config['articleField']];
                 }
             }
+
             return $this->getProductString($products);
-        } elseif (!empty($sBasket['content'])) {
-            $products = array();
+        }
+
+        if (!empty($sBasket['content'])) {
+            $products = [];
 
             foreach ($sBasket['content'] as $article) {
                 if (0 == $article['modus'] && !empty($article[$this->config['articleField']])) {
                     $products[] = $article[$this->config['articleField']];
                 }
             }
+
             return $this->getProductString($products);
         }
-        return "''";
-    }
 
-    protected function getProductString($products)
-    {
-        if (!empty($products)) {
-            return "['" . implode("','", $products) . "']";
-        }
         return "''";
     }
 
@@ -119,7 +127,7 @@ class Frontend implements SubscriberInterface
             case 'checkout' && $action === 'finish':
                 return 'purchase';
                 break;
-            default :
+            default:
                 return 'other';
                 break;
         }
@@ -156,9 +164,6 @@ class Frontend implements SubscriberInterface
         return round($totalVal, 2);
     }
 
-    /**
-     *
-     */
     private function setView()
     {
         $this->view->addTemplateDir(__DIR__ . '/../Views/Common');

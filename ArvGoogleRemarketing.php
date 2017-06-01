@@ -11,10 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ArvGoogleRemarketing extends Plugin
 {
-
     /**
-    * @param ContainerBuilder $container
-    */
+     * @param ContainerBuilder $container
+     */
     public function build(ContainerBuilder $container)
     {
         $container->setParameter('arv_google_remarketing.plugin_dir', $this->getPath());

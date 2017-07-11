@@ -17,7 +17,6 @@ class ArvGoogleRemarketing extends Plugin
     public function build(ContainerBuilder $container)
     {
         $container->setParameter('arv_google_remarketing.plugin_dir', $this->getPath());
-
         parent::build($container);
     }
 

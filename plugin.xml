@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
+    <label lang="de">Google Remarketing</label>
+    <label lang="en">Google Remarketing</label>
+    <version>2.0.0</version>
+    <copyright>(c) arvatis media GmbH</copyright>
+    <license>commercial</license>
+    <link>http://arvatis.com</link>
+    <author>arvatis media GmbH</author>
+
+    <compatibility minVersion="5.2.0" />
+
+    <changelog version="1.0.0">
+        <changes lang="de">Erste Veröffentlichung</changes>
+        <changes lang="en">Initial Release</changes>
+    </changelog>
+    <changelog version="1.0.1">
+        <changes lang="en">Bugfixes</changes>
+        <changes lang="de">Fehlerkorrekturen</changes>
+    </changelog>
+    <changelog version="1.0.2">
+        <changes lang="en">Shopware 4 combatibility</changes>
+        <changes lang="de">Shopware 4 Kompatibilität</changes>
+    </changelog>
+    <changelog version="1.0.5">
+        <changes lang="en">removed the ioncube encoding</changes>
+        <changes lang="de">ioncube verschlüsselung entfernt</changes>
+    </changelog>
+    <changelog version="2.0.0">
+        <changes lang="en">Update Shopware 5.2 Plugin structure</changes>
+        <changes lang="de">Update auf Shopware 5.2 Pluginstruktur</changes>
+    </changelog>
+</plugin>

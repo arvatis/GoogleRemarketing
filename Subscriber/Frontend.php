@@ -6,26 +6,47 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Controller_ActionEventArgs;
 use Enlight_Controller_Request_Request;
 use Enlight_View_Default;
-use Exception;
+use Shopware\Components\Plugin\CachedConfigReader;
+use Shopware\Components\Plugin\ConfigReader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Frontend implements SubscriberInterface
 {
-    private $config;
-    /* @var Enlight_Controller_Request_Request */
+    /**
+     * @var Enlight_Controller_Request_Request
+     */
     private $request;
-    /* @var Enlight_View_Default */
+
+    /**
+     * @var Enlight_View_Default
+     */
     private $view;
+
+    /**
+     * @var ConfigReader|CachedConfigReader
+     */
+    private $configReader;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
     /**
      * Frontend constructor.
      *
-     * @throws Exception
+     * @param CachedConfigReader|ConfigReader $configReader
+     * @param ContainerInterface              $container
      */
-    public function __construct()
+    public function __construct(ConfigReader $configReader, ContainerInterface $container)
     {
-        $this->config = Shopware()->Container()->get('shopware.plugin.config_reader')->getByPluginName('ArvGoogleRemarketing');
+        $this->configReader = $configReader;
+        $this->container = $container;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -43,7 +64,7 @@ class Frontend implements SubscriberInterface
         $this->request = $args->getSubject()->Request();
         $this->view = $args->getSubject()->View();
 
-        if (empty($this->config['CONVERSION_ID']) || $this->request->isXmlHttpRequest()) {
+        if (empty($this->getConfigVar('CONVERSION_ID')) || $this->request->isXmlHttpRequest()) {
             return;
         }
         $this->setView();
@@ -59,6 +80,22 @@ class Frontend implements SubscriberInterface
     }
 
     /**
+     * @param string      $var
+     * @param bool|string $default
+     *
+     * @return bool|string
+     */
+    private function getConfigVar($var, $default = false)
+    {
+        $config = $this->configReader->getByPluginName('ArvGoogleRemarketing', $this->container->get('shop'));
+        if (empty($config[$var])) {
+            return $default;
+        }
+
+        return $config[$var];
+    }
+
+    /**
      * @return string
      */
     private function getProdIdField()
@@ -66,19 +103,16 @@ class Frontend implements SubscriberInterface
         $sArticle = $this->view->getAssign('sArticle');
         $sArticles = $this->view->getAssign('sArticles');
         $sBasket = $this->view->getAssign('sBasket');
-        if (empty($this->config['articleField'])) {
-            $this->config['articleField'] = 'articleID';
-        }
 
-        if (!empty($sArticle) && !empty($sArticle[$this->config['articleField']])) {
-            return "'" . $sArticle[$this->config['articleField']] . "'";
+        if (!empty($sArticle) && !empty($sArticle[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+            return "'" . $sArticle[$this->getConfigVar('ARTICLE_FIELD', 'articleID')] . "'";
         }
 
         if (!empty($sArticles)) {
             $products = [];
             foreach ($sArticles as $article) {
-                if (!empty($article[$this->config['articleField']])) {
-                    $products[] = $article[$this->config['articleField']];
+                if (!empty($article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')];
                 }
             }
 
@@ -89,8 +123,8 @@ class Frontend implements SubscriberInterface
             $products = [];
 
             foreach ($sBasket['content'] as $article) {
-                if (0 == $article['modus'] && !empty($article[$this->config['articleField']])) {
-                    $products[] = $article[$this->config['articleField']];
+                if (0 == $article['modus'] && !empty($article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')];
                 }
             }
 
@@ -176,10 +210,9 @@ class Frontend implements SubscriberInterface
             $this->view->extendsTemplate('frontend/index/index_google.tpl');
         }
 
-        $this->view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField($this->view, $this->config['ARTICLE_FIELD']));
+        $this->view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField());
         $this->view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField());
         $this->view->assign('ARV_GR_ECOM_TOTALVALUE', $this->getTotalValueField());
-
-        $this->view->assign('ARV_GR_CONVERSION_ID', $this->config['CONVERSION_ID']);
+        $this->view->assign('ARV_GR_CONVERSION_ID', $this->getConfigVar('CONVERSION_ID'));
     }
 }

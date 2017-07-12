@@ -23,11 +23,6 @@ class Frontend implements SubscriberInterface
     private $view;
 
     /**
-     * @var array|mixed
-     */
-    private $config;
-
-    /**
      * @var ConfigReader|CachedConfigReader
      */
     private $configReader;
@@ -59,9 +54,21 @@ class Frontend implements SubscriberInterface
         ];
     }
 
-    private function getConfig()
+    /**
+     * @param $var string
+     * @return bool|string
+     */
+    private function getConfigVar($var)
     {
-        $this->config = $this->configReader->getByPluginName('ArvGoogleRemarketing', $this->container->get('shop'));
+        $config = $this->configReader->getByPluginName('ArvGoogleRemarketing', $this->container->get('shop'));
+        if ('ARTICLE_FIELD' == $var && empty($config['ARTICLE_FIELD'])) {
+            $config['ARTICLE_FIELD'] = 'articleID';
+        }
+
+        if (!empty($config["$var"])) {
+            return $config["$var"];
+        }
+        return false;
     }
 
     /**
@@ -71,11 +78,10 @@ class Frontend implements SubscriberInterface
      */
     public function onPostDispatch(Enlight_Controller_ActionEventArgs $args)
     {
-        $this->getConfig();
         $this->request = $args->getSubject()->Request();
         $this->view = $args->getSubject()->View();
 
-        if (empty($this->config['CONVERSION_ID']) || $this->request->isXmlHttpRequest()) {
+        if (empty($this->getConfigVar('CONVERSION_ID')) || $this->request->isXmlHttpRequest()) {
             return;
         }
         $this->setView();
@@ -95,23 +101,19 @@ class Frontend implements SubscriberInterface
      */
     private function getProdIdField()
     {
-        $this->getConfig();
         $sArticle = $this->view->getAssign('sArticle');
         $sArticles = $this->view->getAssign('sArticles');
         $sBasket = $this->view->getAssign('sBasket');
-        if (empty($this->config['ARTICLE_FIELD'])) {
-            $this->config['ARTICLE_FIELD'] = 'articleID';
-        }
 
-        if (!empty($sArticle) && !empty($sArticle[$this->config['ARTICLE_FIELD']])) {
-            return "'" . $sArticle[$this->config['ARTICLE_FIELD']] . "'";
+        if (!empty($sArticle) && !empty($sArticle[$this->getConfigVar('ARTICLE_FIELD')])) {
+            return "'" . $sArticle[$this->getConfigVar('ARTICLE_FIELD')] . "'";
         }
 
         if (!empty($sArticles)) {
             $products = [];
             foreach ($sArticles as $article) {
-                if (!empty($article[$this->config['ARTICLE_FIELD']])) {
-                    $products[] = $article[$this->config['ARTICLE_FIELD']];
+                if (!empty($article[$this->getConfigVar('ARTICLE_FIELD')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD')];
                 }
             }
 
@@ -122,8 +124,8 @@ class Frontend implements SubscriberInterface
             $products = [];
 
             foreach ($sBasket['content'] as $article) {
-                if (0 == $article['modus'] && !empty($article[$this->config['ARTICLE_FIELD']])) {
-                    $products[] = $article[$this->config['ARTICLE_FIELD']];
+                if (0 == $article['modus'] && !empty($article[$this->getConfigVar('ARTICLE_FIELD')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD')];
                 }
             }
 
@@ -199,7 +201,6 @@ class Frontend implements SubscriberInterface
 
     private function setView()
     {
-        $this->getConfig();
         $this->view->addTemplateDir(__DIR__ . '/../Views/Common');
 
         $version = Shopware()->Shop()->getTemplate()->getVersion();
@@ -213,7 +214,6 @@ class Frontend implements SubscriberInterface
         $this->view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField());
         $this->view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField());
         $this->view->assign('ARV_GR_ECOM_TOTALVALUE', $this->getTotalValueField());
-
-        $this->view->assign('ARV_GR_CONVERSION_ID', $this->config['CONVERSION_ID']);
+        $this->view->assign('ARV_GR_CONVERSION_ID', $this->getConfigVar('CONVERSION_ID'));
     }
 }

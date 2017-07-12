@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="arv_google_remarketing.subscriber.frontend" class="ArvGoogleRemarketing\Subscriber\Frontend">
-            <argument type="service" id="shopware.plugin.config_reader" />
+            <argument type="service" id="shopware.plugin.cached_config_reader" />
             <argument type="service" id="service_container" />
             <tag name="shopware.event_subscriber" />
         </service>

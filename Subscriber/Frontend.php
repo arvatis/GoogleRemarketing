@@ -55,23 +55,6 @@ class Frontend implements SubscriberInterface
     }
 
     /**
-     * @param $var string
-     * @return bool|string
-     */
-    private function getConfigVar($var)
-    {
-        $config = $this->configReader->getByPluginName('ArvGoogleRemarketing', $this->container->get('shop'));
-        if ('ARTICLE_FIELD' == $var && empty($config['ARTICLE_FIELD'])) {
-            $config['ARTICLE_FIELD'] = 'articleID';
-        }
-
-        if (!empty($config["$var"])) {
-            return $config["$var"];
-        }
-        return false;
-    }
-
-    /**
      * Event listener method
      *
      * @param Enlight_Controller_ActionEventArgs $args
@@ -97,6 +80,22 @@ class Frontend implements SubscriberInterface
     }
 
     /**
+     * @param string      $var
+     * @param bool|string $default
+     *
+     * @return bool|string
+     */
+    private function getConfigVar($var, $default = false)
+    {
+        $config = $this->configReader->getByPluginName('ArvGoogleRemarketing', $this->container->get('shop'));
+        if (empty($config[$var])) {
+            return $default;
+        }
+
+        return $config[$var];
+    }
+
+    /**
      * @return string
      */
     private function getProdIdField()
@@ -105,15 +104,15 @@ class Frontend implements SubscriberInterface
         $sArticles = $this->view->getAssign('sArticles');
         $sBasket = $this->view->getAssign('sBasket');
 
-        if (!empty($sArticle) && !empty($sArticle[$this->getConfigVar('ARTICLE_FIELD')])) {
-            return "'" . $sArticle[$this->getConfigVar('ARTICLE_FIELD')] . "'";
+        if (!empty($sArticle) && !empty($sArticle[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+            return "'" . $sArticle[$this->getConfigVar('ARTICLE_FIELD', 'articleID')] . "'";
         }
 
         if (!empty($sArticles)) {
             $products = [];
             foreach ($sArticles as $article) {
-                if (!empty($article[$this->getConfigVar('ARTICLE_FIELD')])) {
-                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD')];
+                if (!empty($article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')];
                 }
             }
 
@@ -124,8 +123,8 @@ class Frontend implements SubscriberInterface
             $products = [];
 
             foreach ($sBasket['content'] as $article) {
-                if (0 == $article['modus'] && !empty($article[$this->getConfigVar('ARTICLE_FIELD')])) {
-                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD')];
+                if (0 == $article['modus'] && !empty($article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')];
                 }
             }
 

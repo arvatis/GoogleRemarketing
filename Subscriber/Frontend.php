@@ -53,7 +53,6 @@ class Frontend implements SubscriberInterface
      */
     public function onPostDispatch(Enlight_Controller_ActionEventArgs $args)
     {
-
         $this->request = $args->getSubject()->Request();
         $this->view = $args->getSubject()->View();
 
@@ -193,7 +192,6 @@ class Frontend implements SubscriberInterface
         $this->view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField());
         $this->view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField());
         $this->view->assign('ARV_GR_ECOM_TOTALVALUE', $this->getTotalValueField());
-
         $this->view->assign('ARV_GR_CONVERSION_ID', $this->config['CONVERSION_ID']);
     }
 }

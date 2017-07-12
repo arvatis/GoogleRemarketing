@@ -8,6 +8,7 @@ use Enlight_Controller_Request_Request;
 use Enlight_View_Default;
 use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware\Components\Plugin\ConfigReader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Frontend implements SubscriberInterface
 {
@@ -27,13 +28,25 @@ class Frontend implements SubscriberInterface
     private $config;
 
     /**
+     * @var ConfigReader|CachedConfigReader
+     */
+    private $configReader;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
      * Frontend constructor.
      *
-     * @param CachedConfigReader|ConfigReader      $configReader
+     * @param CachedConfigReader|ConfigReader $configReader
+     * @param ContainerInterface              $container
      */
-    public function __construct(ConfigReader $configReader)
+    public function __construct(ConfigReader $configReader, ContainerInterface $container)
     {
-        $this->config = $configReader->getByPluginName('ArvGoogleRemarketing', Shopware()->Shop());
+        $this->configReader = $configReader;
+        $this->container = $container;
     }
 
     /**
@@ -46,6 +59,11 @@ class Frontend implements SubscriberInterface
         ];
     }
 
+    private function getConfig()
+    {
+        $this->config = $this->configReader->getByPluginName('ArvGoogleRemarketing', $this->container->get('shop'));
+    }
+
     /**
      * Event listener method
      *
@@ -53,6 +71,7 @@ class Frontend implements SubscriberInterface
      */
     public function onPostDispatch(Enlight_Controller_ActionEventArgs $args)
     {
+        $this->getConfig();
         $this->request = $args->getSubject()->Request();
         $this->view = $args->getSubject()->View();
 
@@ -76,6 +95,7 @@ class Frontend implements SubscriberInterface
      */
     private function getProdIdField()
     {
+        $this->getConfig();
         $sArticle = $this->view->getAssign('sArticle');
         $sArticles = $this->view->getAssign('sArticles');
         $sBasket = $this->view->getAssign('sBasket');
@@ -179,6 +199,7 @@ class Frontend implements SubscriberInterface
 
     private function setView()
     {
+        $this->getConfig();
         $this->view->addTemplateDir(__DIR__ . '/../Views/Common');
 
         $version = Shopware()->Shop()->getTemplate()->getVersion();
@@ -192,6 +213,7 @@ class Frontend implements SubscriberInterface
         $this->view->assign('ARV_GR_ECOM_PRODID', $this->getProdIdField());
         $this->view->assign('ARV_GR_ECOM_PAGETYPE', $this->getPageTypeField());
         $this->view->assign('ARV_GR_ECOM_TOTALVALUE', $this->getTotalValueField());
+
         $this->view->assign('ARV_GR_CONVERSION_ID', $this->config['CONVERSION_ID']);
     }
 }

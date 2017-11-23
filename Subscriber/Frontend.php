@@ -143,7 +143,7 @@ class Frontend implements SubscriberInterface
         $action = $this->request->getActionName();
 
         switch ($controller) {
-            case 'index' && $action === 'index':
+            case 'index':
                 return 'home';
                 break;
             case 'search':

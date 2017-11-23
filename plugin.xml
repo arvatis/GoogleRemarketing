@@ -35,4 +35,8 @@
         <changes lang="de">Ladeverhalten der Config optimiert</changes>
         <changes lang="en">Fixed Config loadingbehavior</changes>
     </changelog>
+    <changelog version="2.1.1">
+        <changes lang="de">Pagetype wird nun auf allen Seiten richtig gesetzt</changes>
+        <changes lang="en">Fixed pagetype on several pages</changes>
+    </changelog>
 </plugin>

@@ -51,6 +51,7 @@ class Frontend implements SubscriberInterface
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Frontend' => 'onPostDispatch',
+            'Enlight_Controller_Action_PostDispatchSecure_Frontend_Search' => 'onPostDispatchSearch'
         ];
     }
 
@@ -61,13 +62,27 @@ class Frontend implements SubscriberInterface
      */
     public function onPostDispatch(Enlight_Controller_ActionEventArgs $args)
     {
-        $this->request = $args->getSubject()->Request();
-        $this->view = $args->getSubject()->View();
+        if($args->getSubject()->Request()->getActionName() !== 'defaultSearch') {
+            $this->request = $args->getSubject()->Request();
+            $this->view = $args->getSubject()->View();
 
-        if (empty($this->getConfigVar('CONVERSION_ID')) || $this->request->isXmlHttpRequest()) {
-            return;
+            if (empty($this->getConfigVar('CONVERSION_ID')) || $this->request->isXmlHttpRequest()) {
+                return;
+            }
+            $this->setView();
         }
-        $this->setView();
+    }
+
+    public function onPostDispatchSearch($args) {
+        if($args->getSubject()->Request()->getActionName() === 'defaultSearch') {
+            $this->request = $args->getSubject()->Request();
+            $this->view = $args->getSubject()->View();
+
+            if (empty($this->getConfigVar('CONVERSION_ID')) || $this->request->isXmlHttpRequest()) {
+                return;
+            }
+            $this->setView();
+        }
     }
 
     protected function getProductString($products)
@@ -95,6 +110,7 @@ class Frontend implements SubscriberInterface
         return $config[$var];
     }
 
+
     /**
      * @return string
      */
@@ -103,6 +119,7 @@ class Frontend implements SubscriberInterface
         $sArticle = $this->view->getAssign('sArticle');
         $sArticles = $this->view->getAssign('sArticles');
         $sBasket = $this->view->getAssign('sBasket');
+        $sSearchResults = $this->view->getAssign('sSearchResults');
 
         if (!empty($sArticle) && !empty($sArticle[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
             return "'" . $sArticle[$this->getConfigVar('ARTICLE_FIELD', 'articleID')] . "'";
@@ -111,6 +128,17 @@ class Frontend implements SubscriberInterface
         if (!empty($sArticles)) {
             $products = [];
             foreach ($sArticles as $article) {
+                if (!empty($article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
+                    $products[] = $article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')];
+                }
+            }
+
+            return $this->getProductString($products);
+        }
+
+        if (!empty($sSearchResults['sArticles'])) {
+            $products = [];
+            foreach ($sSearchResults['sArticles'] as $article) {
                 if (!empty($article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')])) {
                     $products[] = $article[$this->getConfigVar('ARTICLE_FIELD', 'articleID')];
                 }

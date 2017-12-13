@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
     <label lang="de">Google Remarketing</label>
     <label lang="en">Google Remarketing</label>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
     <copyright>(c) arvatis media GmbH</copyright>
     <license>commercial</license>
     <link>http://arvatis.com</link>
@@ -38,5 +38,9 @@
     <changelog version="2.1.1">
         <changes lang="de">Pagetype wird nun auf allen Seiten richtig gesetzt</changes>
         <changes lang="en">Fixed pagetype on several pages</changes>
+    </changelog>
+    <changelog version="2.1.2">
+        <changes lang="de">Artikel in der Suche werden nun in prodid mit einbezogen</changes>
+        <changes lang="en">Product search includes found products in prodid now</changes>
     </changelog>
 </plugin>
